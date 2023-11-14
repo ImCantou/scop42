@@ -30,10 +30,13 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 			@printf "`tput bold`\033[92m[SUCCESS]\033[0;37m: `tput bold`Compilating \033[1;94m${SRCDIR}\033[0;37m/$(notdir $<)\033[1;37m to object done.\n`tput sgr0`"
 
 
+
 ${NAME}: $(SRCS)
+	$(CXX) $(CXXFLAGS) -o $(NAME) main.cpp $(LDFLAGS)
+
+shaders:
 	~/glslc/bin/glslc shaders/shader.vert -o compiled_shaders/vert.spv
 	~/glslc/bin/glslc shaders/shader.frag -o compiled_shaders/frag.spv
-	$(CXX) $(CXXFLAGS) -o $(NAME) main.cpp $(LDFLAGS)
 
 debug: $(SRCS)
 	$(CXX) $(CXXFLAGS) -DNDEBUG -o $(NAME) main.cpp $(LDFLAGS)
