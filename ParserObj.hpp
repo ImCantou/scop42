@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:20 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/14 12:31:54 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/15 16:08:32 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,13 @@ class	ParserObj {
 		static glm::vec3				ParseVertexNormal(const std::string line);
 		static glm::vec2				ParseVertexText(const std::string line);
 
-		static std::vector<uint32_t>	ParseFace(Model3D&, const std::string);
+		static void						ParseFace(Model3D&, const std::string);
+
+		static bool						checkExistingVertexInFace(const Model3D&, const std::vector<uint32_t>& vert, const std::vector<uint32_t>& vertText, const std::vector<uint32_t>& vertNorm);
 
 	public:
 
 		static Model3D					parseFile(const std::string filename);
-
 
 };
 

@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:00:19 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/14 12:22:38 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/15 17:10:38 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ class Model3D {
 		std::vector<glm::vec2>	verticesText;
 		std::vector<glm::vec3>	verticesNorm;
 		std::vector<uint32_t>	indices;
+		std::vector<uint32_t>	indicesText;
+		std::vector<uint32_t>	indicesNorm;
 
 	public:
 		Model3D(void);
@@ -38,11 +40,19 @@ class Model3D {
 
 		Model3D & operator=(Model3D const & rhs);
 
+		//Setters
 		void	addVertex(const Vertex& vertex);
 		void	addVertexText(const glm::vec2& vertexText);
-		void	addVertexNormal(const glm::vec2& vertexNorm);
+		void	addVertexNormal(const glm::vec3& vertexNorm);
+
+		void	addFace(const std::vector<uint32_t>&, const std::vector<uint32_t>&, const std::vector<uint32_t>&);
 
 		void	setMtllib(const std::string);
+
+		//Getters
+		const   std::vector<Vertex>&	vert() const;
+		const   std::vector<Vertex>&	vertText() const;
+		const   std::vector<Vertex>&	vertNorm() const;
 };
 
 #endif

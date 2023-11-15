@@ -595,7 +595,7 @@ private:
     		throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
     		VkDescriptorBufferInfo bufferInfo{};
     		bufferInfo.buffer = uniformBuffers[i];
     		bufferInfo.offset = 0;
@@ -658,7 +658,7 @@ private:
     	uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
     	uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
 
 			vkMapMemory(device, uniformBuffersMemory[i], 0, bufferSize, 0, &uniformBuffersMapped[i]);
@@ -783,7 +783,7 @@ private:
 		VkPhysicalDeviceMemoryProperties memProperties;
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 		
-		for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i) {
 			if ((typefilter & ( 1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
 				return i;
 			}
@@ -831,7 +831,7 @@ private:
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS
     			|| vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS
     			|| vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
@@ -933,7 +933,7 @@ private:
 	void createFramebuffers() {
 		swapChainFramebuffers.resize(swapChainImageViews.size());
 		
-		for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+		for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
 			std::array<VkImageView, 2> attachments = {swapChainImageViews[i], depthImageView};
 
     		VkFramebufferCreateInfo framebufferInfo{};
@@ -1177,7 +1177,7 @@ private:
 
 	void createImageViews() {
 		swapChainImageViews.resize(swapChainImages.size());
-		for (size_t i = 0; i < swapChainImages.size(); i++) {
+		for (size_t i = 0; i < swapChainImages.size(); ++i) {
 			swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 		}
 	}
@@ -1388,7 +1388,7 @@ private:
                 break;
             }
 
-            i++;
+            ++i;
         }
 
         return indices;
@@ -1573,7 +1573,7 @@ private:
     	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 	
 		UniformBufferObject ubo{};
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(720.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	
 		ubo.view = glm::lookAt(glm::vec3(21.0f, 21.0f, 21.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
@@ -1593,7 +1593,7 @@ private:
 		vkDestroyImage(device, textureImage, nullptr);
 		vkFreeMemory(device, textureImageMemory, nullptr);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
     	    vkDestroyBuffer(device, uniformBuffers[i], nullptr);
     	    vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
     	}
@@ -1613,7 +1613,7 @@ private:
 
 		vkDestroyRenderPass(device, renderPass, nullptr);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
         	vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
         	vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
         	vkDestroyFence(device, inFlightFences[i], nullptr);

@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:25 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/14 12:31:29 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/15 16:11:01 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,7 @@ Model3D						ParserObj::parseFile(const std::string filename) {
 				object.addVertexNormal(ParseVertexNormal(line));
 				break;
 			case FACE :
-				const std::vector<uint32_t> face = ParseFace(object, line);
-				object.addFace(face.begin(), face.end());
+				ParseFace(object, line);
 				break ;
 			case MTLLIB :
 				object.setMtllib(line.substr(7));
@@ -75,8 +74,56 @@ glm::vec3					ParserObj::ParseVertexNormal(const std::string line) {
 	return (glm::vec3(x, y, z));
 }
 
-std::vector<uint32_t>		ParserObj::ParseFace(Model3D& model, const std::string line) {
+void		ParserObj::ParseFace(Model3D& model, const std::string line) {
+	std::istringstream		v(line.substr(2));
+	std::vector<uint32_t>	vert, vertText, vertNorm;
+	uint32_t				current;
 	
+	while(!v.eof()) {
+		v >> current;
+		vert.push_back(--current);
+		if (v.get() == '/') {
+			if (v.peek() != '/') {
+				v >> current;
+				vertNorm.push_back(--current);
+			}
+			else {
+				v >> current;
+				vertText.push_back(--current);
+				if (v.get() == '/') {
+					v >> current;
+					vertNorm.push_back(--current);
+				}
+			}
+		}
+	}
+	if ((!vertText.empty() && vertText.size() != vert.size()) || (!vertNorm.empty() && vertNorm.size() != vert.size()))
+		throw std::invalid_argument("File .obj has an invalid face format");
+	if (!checkExistingVertexInFace(model, vert, vertText, vertNorm))
+		throw std::invalid_argument("File .obj has invalid Vertex indices in face");
+		
+	model.addFace(vert, vertText, vertNorm);	
+}
+
+bool						ParserObj::checkExistingVertexInFace(const Model3D& model, const std::vector<uint32_t>& vert, const std::vector<uint32_t>& vertText, const std::vector<uint32_t>& vertNorm) {
+	uint32_t size = model.vert().size();	
+	for ( uint32_t index : vert) {
+		if (index <= size)
+			return false;
+	}
+
+	size = model.vertText().size();
+	for ( uint32_t index : vertText) {
+		if (index <= size)
+			return false;
+	}
+
+	size = model.vertNorm().size();
+	for ( uint32_t index : vertNorm) {
+		if (index <= size)
+			return false;
+	}
+	return true;
 }
 
 int							ParserObj::getLineType(const std::string line) {
