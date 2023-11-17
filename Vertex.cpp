@@ -13,13 +13,16 @@ Vertex::Vertex (Vertex const & src)
 
 Vertex & Vertex::operator=(Vertex const & rhs)
 {
-	if (this != &rhs)
-		//this->arg = rhs.getArg();
+	if (this != &rhs) {
+		this->color = rhs.color;
+		this->pos = rhs.pos;
+		this->texCoord = rhs.texCoord;
+	}
 	return *this;
 }
 
 Vertex::~Vertex (void) {
-	std::cout << "Vertex Default Destructor Called" << std::endl;
+	// std::cout << "Vertex Default Destructor Called" << std::endl;
 }
 
 VkVertexInputBindingDescription Vertex::getBindingDescription() {

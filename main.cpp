@@ -4,28 +4,10 @@
 #define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3native.h>
 
-#include <optional>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <cstdlib>
-#include <limits> 
-#include <algorithm>
-#include <cstring>
-#include <vector>
-#include <set>
-#include <array>
-#include <chrono>
-
-#define	GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "ParserObj.hpp"
 
 
 const uint32_t WIDTH = 800;
@@ -36,42 +18,6 @@ struct UniformBufferObject {
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 proj;
-};
-
-struct Vertex {
-    glm::vec3	pos;
-    glm::vec3	color;
-	glm::vec2	texCoord;
-
-    static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-        return bindingDescription;
-    }
-
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
-        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-		attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
-
-        return attributeDescriptions;
-    }
 };
 
 const std::vector<const char*> validationLayers = {
@@ -194,9 +140,7 @@ private:
 	VkImageView						depthImageView;
 
 	//	Model definition
-	std::vector<Vertex>				vertices;
-	std::vector<glm::vec2>			texCoords;		
-	std::vector<uint32_t>			indices;
+	Model3D							model;
 
 	//Basic variables
 	uint32_t	currentFrame = 0;
@@ -250,40 +194,42 @@ private:
 
 	void	loadModel() {
 
-		std::ifstream	in("resources/Charizard.obj", std::ios::in);
-		std::string		line;
+		this->model = ParserObj::parseFile("resources/42.obj");
 		
-		if (!in)
-			throw	std::runtime_error("failed to open .obj file!");
+		// std::ifstream	in("resources/Charizard.obj", std::ios::in);
+		// std::string		line;
+		
+		// if (!in)
+		// 	throw	std::runtime_error("failed to open .obj file!");
 
-		while(std::getline(in, line)) {
-			if(line.substr(0, 2) == "v ") {
-				std::istringstream	v(line.substr(2));
-				float	x , y , z;
-				v >> x;
-				v >> y;
-				v >> z;
-				vertices.push_back({{x, y, -z - 6}, {0.85f, 0.33f, 0.1f}, {0.0f, 0.0f}});
-			}
-			else if (line.substr(0, 2) == "vt ") {
-				std::istringstream	v(line.substr(3));
-				float	x, y;
-				v >> x;
-				v >> y;
-				texCoords.push_back({x, y});
-			}
-			else if (line.substr(0, 2) == "f ") {
-				int a,b,c; //to store mesh index
-			    int A,B,C;
-				const char* chh=line.c_str();
-    			sscanf (chh, "f %i/%i %i/%i %i/%i",&a,&A,&b,&B, &c, &C);
-    			a--;b--;c--;
-    			indices.push_back(a);
-    			indices.push_back(b);
-    			indices.push_back(c);
-			}
+		// while(std::getline(in, line)) {
+		// 	if(line.substr(0, 2) == "v ") {
+		// 		std::istringstream	v(line.substr(2));
+		// 		float	x , y , z;
+		// 		v >> x;
+		// 		v >> y;
+		// 		v >> z;
+		// 		vertices.push_back({{x, y, -z - 6}, {0.85f, 0.33f, 0.1f}, {0.0f, 0.0f}});
+		// 	}
+		// 	else if (line.substr(0, 2) == "vt ") {
+		// 		std::istringstream	v(line.substr(3));
+		// 		float	x, y;
+		// 		v >> x;
+		// 		v >> y;
+		// 		texCoords.push_back({x, y});
+		// 	}
+		// 	else if (line.substr(0, 2) == "f ") {
+		// 		int a,b,c; //to store mesh index
+		// 	    int A,B,C;
+		// 		const char* chh=line.c_str();
+    	// 		sscanf (chh, "f %i/%i %i/%i %i/%i",&a,&A,&b,&B, &c, &C);
+    	// 		a--;b--;c--;
+    	// 		indices.push_back(a);
+    	// 		indices.push_back(b);
+    	// 		indices.push_back(c);
+		// 	}
 
-		}
+		// }
 		// vertices.push_back({{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}});  //0
     	// vertices.push_back({{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}});	//1
     	// vertices.push_back({{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}});	//2
@@ -694,7 +640,7 @@ private:
 	} 
 
 	void createIndexBuffer() {
-		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+		VkDeviceSize bufferSize = sizeof(model.getIndices()[0]) * model.getIndices().size();
 
     	VkBuffer stagingBuffer;
     	VkDeviceMemory stagingBufferMemory;
@@ -702,7 +648,7 @@ private:
 
     	void* data;
     	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    	memcpy(data, indices.data(), (size_t) bufferSize);
+    	memcpy(data, model.getIndices().data(), (size_t) bufferSize);
     	vkUnmapMemory(device, stagingBufferMemory);
 
     	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
@@ -714,7 +660,7 @@ private:
 	}
 
 	void createVertexBuffer() {
-		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+		VkDeviceSize bufferSize = sizeof(model.getVertices()[0]) * model.getVertices().size();
 		
 		VkBuffer		stagingBuffer;
 		VkDeviceMemory	stagingBufferMemory;
@@ -723,7 +669,7 @@ private:
 
 		void*	data;
 		vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-			memcpy(data, vertices.data(), (size_t) bufferSize);
+			memcpy(data, model.getVertices().data(), (size_t) bufferSize);
 		vkUnmapMemory(device, stagingBufferMemory);
 
 		createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
@@ -908,7 +854,7 @@ private:
 		// vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
-		vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+		vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(model.getIndices().size()), 1, 0, 0, 0);
 
 		vkCmdEndRenderPass(commandBuffer);
 
@@ -1573,9 +1519,9 @@ private:
     	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 	
 		UniformBufferObject ubo{};
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(720.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(360.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	
-		ubo.view = glm::lookAt(glm::vec3(21.0f, 21.0f, 21.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.view = glm::lookAt(glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 400.0f);
 

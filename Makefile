@@ -1,5 +1,5 @@
 
-SRCS= main.cpp
+SRCS= main.cpp Model3D.cpp ParserObj.cpp Vertex.cpp
 
 CXX= g++
 
@@ -19,14 +19,14 @@ CXXFLAGS = -std=c++20 -O3 -I$(GLM_PATH) -I$(STB_PATH)
 LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c 
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp 
 			@$(CC) -c $(CFLAGS) $< -o $@
 			@printf "`tput bold`\033[92m[SUCCESS]\033[0;37m: `tput bold`Compilating \033[1;94m${SRCDIR}\033[0;37m/$(notdir $<)\033[1;37m to object done.\n`tput sgr0`"
 
 
 
 ${NAME}: $(SRCS)
-	$(CXX) $(CXXFLAGS) -o $(NAME) main.cpp $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o $(NAME) ${SRCS} $(LDFLAGS)
 
 shaders:
 	~/glslc shaders/shader.vert -o compiled_shaders/vert.spv

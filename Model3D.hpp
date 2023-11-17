@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:00:19 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/16 15:43:34 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/17 13:53:41 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,10 @@ class Model3D {
 		void	setMtllib(const std::string);
 
 		//Getters
-		const   std::vector<Vertex>&	vert() const;
-		const   std::vector<Vertex>&	vertText() const;
-		const   std::vector<Vertex>&	vertNorm() const;
+		const   std::vector<Vertex>&	getVertices() const;
+		const   std::vector<glm::vec2>&	getVerticesText() const;
+		const   std::vector<glm::vec3>&	getVerticesNorm() const;
+		const	std::vector<uint32_t>&	getIndices() const;
 };
 
 #endif

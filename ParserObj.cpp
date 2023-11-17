@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:25 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/15 16:11:01 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/17 15:19:03 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,30 +99,37 @@ void		ParserObj::ParseFace(Model3D& model, const std::string line) {
 	}
 	if ((!vertText.empty() && vertText.size() != vert.size()) || (!vertNorm.empty() && vertNorm.size() != vert.size()))
 		throw std::invalid_argument("File .obj has an invalid face format");
-	if (!checkExistingVertexInFace(model, vert, vertText, vertNorm))
-		throw std::invalid_argument("File .obj has invalid Vertex indices in face");
+	if (!checkExistingVertexInFace(model, vert, vertText, vertNorm)) {
+		throw std::invalid_argument("File .obj has invalid Vertex indices in face");		
+	}
 		
-	model.addFace(vert, vertText, vertNorm);	
+	model.addFace(vert, vertText, vertNorm);
+	// std::cin.getline(line);
 }
 
 bool						ParserObj::checkExistingVertexInFace(const Model3D& model, const std::vector<uint32_t>& vert, const std::vector<uint32_t>& vertText, const std::vector<uint32_t>& vertNorm) {
-	uint32_t size = model.vert().size();	
+	uint32_t size = model.getVertices().size();	
 	for ( uint32_t index : vert) {
-		if (index <= size)
+		if (index >= size)
 			return false;
 	}
 
-	size = model.vertText().size();
-	for ( uint32_t index : vertText) {
-		if (index <= size)
-			return false;
+	size = model.getVerticesText().size();
+	if (!model.getVerticesText().empty() &&!vertText.empty()) {
+		for ( uint32_t index : vertText) {
+			if (index >= size)
+				return false;
+		}
 	}
-
-	size = model.vertNorm().size();
-	for ( uint32_t index : vertNorm) {
-		if (index <= size)
-			return false;
+	
+	size = model.getVerticesNorm().size();
+	if (!model.getVerticesNorm().empty() && !vertNorm.empty()) {
+		for ( uint32_t index : vertNorm) {
+			if (index >= size)
+				return false;
+		}
 	}
+	
 	return true;
 }
 
