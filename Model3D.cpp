@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:01:54 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/14 12:22:32 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/16 15:43:55 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,19 @@ void	Model3D::addVertexNormal(const glm::vec3& vertexNorm) {
 
 void	Model3D::setMtllib(const std::string mtlLib) {
 	this->mtllib = mtlLib;
+}
+
+void	Model3D::addFace(std::vector<uint32_t>& vert, std::vector<uint32_t>& vertText, std::vector<uint32_t>& vertNorm) {
+	if (vert.size() < 3)
+		throw std::invalid_argument("Face with less than 3 vertices in .obj file!");
+	this->indices.insert(indices.end(), vert.begin(), vert.begin() + 2);
+	vert.erase(vert.begin() + 1);
+	if (!vertText.empty()) {
+		this->indicesText.insert(indicesText.end(), vertText.begin(), vertText.begin() + 2);
+		vertText.erase(vertText.begin() + 1);
+	}
+	if (!vertNorm.empty()) {
+		this->indicesText.insert(indicesText.end(), vertNorm.begin(), vertNorm.begin() + 2);
+		vertNorm.erase(vertNorm.begin() + 1);
+	}
 }

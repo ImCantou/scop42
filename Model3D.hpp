@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:00:19 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/15 17:10:38 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/16 15:43:34 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ class Model3D {
 		void	addVertexText(const glm::vec2& vertexText);
 		void	addVertexNormal(const glm::vec3& vertexNorm);
 
-		void	addFace(const std::vector<uint32_t>&, const std::vector<uint32_t>&, const std::vector<uint32_t>&);
+		void	addFace( std::vector<uint32_t>&,  std::vector<uint32_t>&,  std::vector<uint32_t>&);
 
 		void	setMtllib(const std::string);
 
