@@ -67,6 +67,8 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 class HelloTriangleApplication {
 public:
+	HelloTriangleApplication(std::string path): pathToFile(path) {}
+
     void run() {
         initWindow();
 	    initVulkan();
@@ -140,6 +142,7 @@ private:
 	VkImageView						depthImageView;
 
 	//	Model definition
+	std::string						pathToFile;
 	Model3D							model;
 
 	//Basic variables
@@ -194,7 +197,7 @@ private:
 
 	void	loadModel() {
 
-		this->model = ParserObj::parseFile("resources/42.obj");
+		this->model = ParserObj::parseFile(pathToFile);
 		
 		// std::ifstream	in("resources/Charizard.obj", std::ios::in);
 		// std::string		line;
@@ -378,7 +381,7 @@ private:
 	void	createTextureImage() {
 		// read Texture image to pixels using STBI library
 		int texWidth, texHeight, texChannels;
-		stbi_uc*	pixels = stbi_load("Textures/banana.jpeg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+		stbi_uc*	pixels = stbi_load("/mnt/nfs/homes/qcherel/Documents/OpenGL/scop42/Textures/banana.jpeg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 		VkDeviceSize	imgSize = texWidth * texHeight * STBI_rgb_alpha;
 
 		if (!pixels) {
@@ -1014,8 +1017,8 @@ private:
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
-        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-        rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+        rasterizer.cullMode = VK_CULL_MODE_NONE;
+        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f;
 		rasterizer.depthBiasClamp = 0.0f;
@@ -1519,9 +1522,9 @@ private:
     	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 	
 		UniformBufferObject ubo{};
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(360.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	
-		ubo.view = glm::lookAt(glm::vec3(12.0f, 12.0f, 12.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.view = glm::lookAt(glm::vec3(40.0f, 40.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 400.0f);
 
@@ -1737,8 +1740,13 @@ private:
 
 
 
-int main() {
-    HelloTriangleApplication app;
+int main(int ac, char **av) {
+	if (ac != 2)
+	{
+		std::cout << "usage: ./VulkanTest [path to .obj file]." << std::endl;
+		return (0);
+	}
+    HelloTriangleApplication app(av[1]);
 
     try {
         app.run();

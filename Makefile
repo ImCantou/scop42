@@ -1,5 +1,5 @@
 
-SRCS= main.cpp Model3D.cpp ParserObj.cpp Vertex.cpp
+SRCS= main.cpp str_utils.cpp Model3D.cpp ParserObj.cpp Vertex.cpp
 
 CXX= g++
 
@@ -26,11 +26,12 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 
 
 ${NAME}: $(SRCS)
+	~/glslc shaders/shader.vert -o compiled_shaders/vert.spv
+	~/glslc shaders/shader.frag -o compiled_shaders/frag.spv
 	$(CXX) $(CXXFLAGS) -o $(NAME) ${SRCS} $(LDFLAGS)
 
 shaders:
-	~/glslc shaders/shader.vert -o compiled_shaders/vert.spv
-	~/glslc shaders/shader.frag -o compiled_shaders/frag.spv
+	
 
 debug: $(SRCS)
 	$(CXX) $(CXXFLAGS) -DNDEBUG -o $(NAME) main.cpp $(LDFLAGS)
@@ -39,7 +40,7 @@ test: ${NAME}
 	./VulkanTest
 
 clean:
-		rm -f $(NAME)
+	rm -f $(NAME)
 
 re: clean all
 

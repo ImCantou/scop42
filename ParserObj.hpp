@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:20 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/17 14:42:35 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/20 12:13:06 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,13 @@
 #include <algorithm>
 #include <cstring>
 #include <vector>
+#include <list>
 #include <set>
 #include <array>
 #include <chrono>
 
 #include "Model3D.hpp"
+#include "str_utils.hpp"
 
 # define	GLM_FORCE_RADIANS
 # define GLM_FORCE_DEPTH_ZERO_TO_ONE

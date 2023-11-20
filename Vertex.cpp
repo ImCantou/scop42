@@ -3,7 +3,12 @@
 Vertex::Vertex (void) {
 }
 
-Vertex::Vertex (glm::vec3 position): pos(position), color({1.0f, 1.0f, 1.0f}), texCoord({-1.0f, -1.0f}) {
+Vertex::Vertex (glm::vec3 position): pos(position), color({0.8f, 0.8f, 0.8f}), texCoord({-1.0f, -1.0f}) {
+	static int i = 0;
+	if (i % 2 == 0)
+		texCoord = {1.0f, 1.0f};
+	
+	i = (i + 1) % 2;
 }
 
 Vertex::Vertex (Vertex const & src)

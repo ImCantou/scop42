@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:25 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/17 15:19:03 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/20 12:22:56 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ glm::vec3					ParserObj::ParseVertex(const std::string line) {
 	v >> x;
 	v >> y;
 	v >> z;
-	return (glm::vec3(x, y, z));
+	return (glm::vec3(x, z, y));
 }
 
 glm::vec2					ParserObj::ParseVertexText(const std::string line) {
@@ -75,7 +75,7 @@ glm::vec3					ParserObj::ParseVertexNormal(const std::string line) {
 }
 
 void		ParserObj::ParseFace(Model3D& model, const std::string line) {
-	std::istringstream		v(line.substr(2));
+	std::istringstream		v(trim_copy(line).substr(2));
 	std::vector<uint32_t>	vert, vertText, vertNorm;
 	uint32_t				current;
 	
@@ -83,7 +83,8 @@ void		ParserObj::ParseFace(Model3D& model, const std::string line) {
 		v >> current;
 		vert.push_back(--current);
 		if (v.get() == '/') {
-			if (v.peek() != '/') {
+			if (v.peek() == '/') {
+				v.get();
 				v >> current;
 				vertNorm.push_back(--current);
 			}
@@ -98,11 +99,14 @@ void		ParserObj::ParseFace(Model3D& model, const std::string line) {
 		}
 	}
 	if ((!vertText.empty() && vertText.size() != vert.size()) || (!vertNorm.empty() && vertNorm.size() != vert.size()))
+	{
 		throw std::invalid_argument("File .obj has an invalid face format");
+	}
 	if (!checkExistingVertexInFace(model, vert, vertText, vertNorm)) {
 		throw std::invalid_argument("File .obj has invalid Vertex indices in face");		
 	}
-		
+
+	
 	model.addFace(vert, vertText, vertNorm);
 	// std::cin.getline(line);
 }
