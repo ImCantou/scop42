@@ -26,8 +26,6 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 
 
 ${NAME}: $(SRCS)
-	~/glslc shaders/shader.vert -o compiled_shaders/vert.spv
-	~/glslc shaders/shader.frag -o compiled_shaders/frag.spv
 	$(CXX) $(CXXFLAGS) -o $(NAME) ${SRCS} $(LDFLAGS)
 
 shaders:
