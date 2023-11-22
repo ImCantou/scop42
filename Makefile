@@ -1,5 +1,5 @@
 
-SRCS= main.cpp str_utils.cpp Model3D.cpp ParserObj.cpp Vertex.cpp
+SRCS= main.cpp str_utils.cpp Model3D.cpp VulkanInitializer.cpp PipelineCreator.cpp ParserObj.cpp Vertex.cpp
 
 CXX= g++
 
