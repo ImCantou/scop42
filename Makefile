@@ -14,7 +14,7 @@ STB_PATH	=	external/stb
 all: ${NAME}
 
 
-CXXFLAGS = -std=c++20 -O3 -I$(GLM_PATH) -I$(STB_PATH)
+CXXFLAGS = -std=c++20 -g3 -O3 -I$(GLM_PATH) -I$(STB_PATH)
 
 LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 

@@ -159,6 +159,7 @@ private:
 	bool		isInitialized = false;
 	bool		wireframeMode = false;
 	bool		framebufferResized = false;
+	Camera3D	camera;
 
 
 
@@ -184,6 +185,15 @@ private:
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 			glfwSetWindowShouldClose(window, 1);
 		}
+		float cameraSpeed = 0.05f;
+    	if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    	    app->camera.move(CAM_TRANSLATE_FORWARDS, cameraSpeed);
+    	if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    	    app->camera.move(CAM_TRANSLATE_BACKWARDS, cameraSpeed);
+    	if (key == GLFW_KEY_A && action == GLFW_PRESS)
+    	    app->camera.move(CAM_TRANSLATE_LEFT, cameraSpeed);
+    	if (key == GLFW_KEY_D && action == GLFW_PRESS)
+    	    app->camera.move(CAM_TRANSLATE_RIGHT, cameraSpeed);
 	}
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
@@ -289,10 +299,18 @@ private:
 		if(vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create texture sampler!");
 		}
+
+		_mainDeletionQueue.add([=, this]() {
+			vkDestroySampler(device, textureSampler, nullptr);
+		});
 	}
 
 	void createTextureImageView() {
 		textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
+
+		_mainDeletionQueue.add([=, this]() {
+			vkDestroyImageView(device, textureImageView, nullptr);
+		});
 	}
 
 	VkImageView	createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -349,6 +367,11 @@ private:
 
 		vkDestroyBuffer(device, stagingBuffer, nullptr);
 		vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+		_mainDeletionQueue.add([=, this]() {
+			vkDestroyImage(device, textureImage, nullptr);
+			vkFreeMemory(device, textureImageMemory, nullptr);
+		});
 	}
 
 
@@ -536,6 +559,10 @@ private:
 		if(vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor pool!");
 		}
+
+		_mainDeletionQueue.add([=, this]() {
+	    	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+		});
 	}
 
 	void createUniformBuffers() {
@@ -549,6 +576,13 @@ private:
 
 			vkMapMemory(device, uniformABuffers[i].memory, 0, bufferSize, 0, &uniformBuffersMapped[i]);
 		}
+
+		_mainDeletionQueue.add([=, this]() {
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				vkDestroyBuffer(device, uniformABuffers[i].buffer, nullptr);
+				vkFreeMemory(device, uniformABuffers[i].memory, nullptr);
+			}
+		});
 	}
 
 	void createDescriptorSetLayout() {
@@ -577,6 +611,10 @@ private:
 			throw std::runtime_error("failed to create descriptor set layout!");
 		}
 
+		_mainDeletionQueue.add([=, this]() {
+			vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		});
+
 	} 
 
 	void createIndexBuffer() {
@@ -596,6 +634,11 @@ private:
 
     	vkDestroyBuffer(device, stagingABuffer.buffer, nullptr);
     	vkFreeMemory(device, stagingABuffer.memory, nullptr);
+
+		_mainDeletionQueue.add([=, this]() {
+			vkDestroyBuffer(device, indexABuffer.buffer, nullptr);
+			vkFreeMemory(device, indexABuffer.memory, nullptr);
+		});
 	}
 
 	void createVertexBuffer() {
@@ -603,7 +646,7 @@ private:
 		
 		t_AllocatedBuffer	stagingABuffer;
 
-		createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingABuffer.buffer, stagingABuffer.memory;
+		createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingABuffer.buffer, stagingABuffer.memory);
 
 		void*	data;
 		vkMapMemory(device, stagingABuffer.memory, 0, bufferSize, 0, &data);
@@ -616,6 +659,11 @@ private:
 
 		vkDestroyBuffer(device, stagingABuffer.buffer, nullptr);
 		vkFreeMemory(device, stagingABuffer.memory, nullptr);
+
+		_mainDeletionQueue.add([=, this]() {
+			vkDestroyBuffer(device, vertexABuffer.buffer, nullptr);
+			vkFreeMemory(device, vertexABuffer.memory, nullptr);
+		});
 	}
 
 	void	copyBuffer(VkBuffer src, VkBuffer dst, VkDeviceSize size) {
@@ -719,7 +767,7 @@ private:
 			}
 		}
 
-		_mainDeletionQueue.add([=]() {
+		_mainDeletionQueue.add([=, this]() {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
         		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
         		vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
@@ -813,7 +861,7 @@ private:
     		throw std::runtime_error("failed to create command pool!");
 		}
 
-		_mainDeletionQueue.add([=]() {
+		_mainDeletionQueue.add([=, this]() {
 			vkDestroyCommandPool(device, commandPool, nullptr);
 		});
 	}
@@ -909,7 +957,7 @@ private:
 		    throw std::runtime_error("failed to create render pass!");
 		}
 
-		_mainDeletionQueue.add([=]() {
+		_mainDeletionQueue.add([=, this]() {
 			vkDestroyRenderPass(device, renderPass, nullptr);
 		});
 	}
@@ -929,7 +977,7 @@ private:
             throw std::runtime_error("failed to create pipeline layout!");
         }
 
-		_mainDeletionQueue.add([=]() {
+		_mainDeletionQueue.add([=, this]() {
 			vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		});
 
@@ -957,7 +1005,7 @@ private:
 
 		graphicsPipeline = pipelineCreator.build_pipeline(device, renderPass);
 
-		_mainDeletionQueue.add([=]() {
+		_mainDeletionQueue.add([=, this]() {
 			vkDestroyPipeline(device, graphicsPipeline, nullptr);
 		});
 
@@ -965,7 +1013,7 @@ private:
 
 		graphicsPipelineWireframe = pipelineCreator.build_pipeline(device, renderPass);
 
-		_mainDeletionQueue.add([=]() {
+		_mainDeletionQueue.add([=, this]() {
 			vkDestroyPipeline(device, graphicsPipelineWireframe, nullptr);
 		});
 
@@ -1386,7 +1434,7 @@ private:
     	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 	
 		UniformBufferObject ubo = {};
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	
 		ubo.view = glm::lookAt(glm::vec3(40.0f, 40.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
@@ -1403,30 +1451,6 @@ private:
 			vkWaitForFences(device, 1, &inFlightFences[currentFrame], true, UINT64_MAX);
 
 			cleanupSwapChain();
-
-			vkDestroySampler(device, textureSampler, nullptr);
-			vkDestroyImageView(device, textureImageView, nullptr);
-
-			vkDestroyImage(device, textureImage, nullptr);
-			vkFreeMemory(device, textureImageMemory, nullptr);
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-    		    vkDestroyBuffer(device, uniformABuffers[i].buffer, nullptr);
-    		    vkFreeMemory(device, uniformABuffers[i].memory, nullptr);
-    		}
-
-	    	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-
-			vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-
-			vkDestroyBuffer(device, vertexABuffer.buffer, nullptr);
-			vkFreeMemory(device, vertexABuffer.memory, nullptr);
-
-			vkDestroyBuffer(device, indexABuffer.buffer, nullptr);
-			vkFreeMemory(device, indexABuffer.memory, nullptr);
-
-			
-
 
 			_mainDeletionQueue.execute();
 
