@@ -17,6 +17,8 @@
 
 #include "AllocatedBuffer.hpp"
 
+#include "Camera3D.hpp"
+
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -160,6 +162,7 @@ private:
 	bool		wireframeMode = false;
 	bool		framebufferResized = false;
 	Camera3D	camera;
+	glm::vec2	mousePos;
 
 
 
@@ -173,7 +176,31 @@ private:
 		glfwSetWindowUserPointer(window, this);
 		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 		glfwSetKeyCallback(window, key_callback);
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetCursorPosCallback(window, mouse_callback);
     }
+
+	static void	mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+		auto app = reinterpret_cast<VulkanEngine*>(glfwGetWindowUserPointer(window));
+		static bool first = true;
+		if (first) {
+			app->mousePos.x = xpos;
+			app->mousePos.y = ypos;
+			first = false;
+		}
+
+		float xoffset = (xpos - app->mousePos.x) * 0.04;
+		float yoffset = (app->mousePos.y - ypos) * 0.04;
+
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
+
+		}
+		else {
+			app->camera.rotate(xoffset, yoffset);
+		}
+		app->mousePos.x = xpos;
+		app->mousePos.y = ypos;
+	}
 
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{	
@@ -185,14 +212,14 @@ private:
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 			glfwSetWindowShouldClose(window, 1);
 		}
-		float cameraSpeed = 0.05f;
-    	if (key == GLFW_KEY_W && action == GLFW_PRESS)
+		float cameraSpeed = 1.0f;
+    	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     	    app->camera.move(CAM_TRANSLATE_FORWARDS, cameraSpeed);
-    	if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     	    app->camera.move(CAM_TRANSLATE_BACKWARDS, cameraSpeed);
-    	if (key == GLFW_KEY_A && action == GLFW_PRESS)
+    	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     	    app->camera.move(CAM_TRANSLATE_LEFT, cameraSpeed);
-    	if (key == GLFW_KEY_D && action == GLFW_PRESS)
+    	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     	    app->camera.move(CAM_TRANSLATE_RIGHT, cameraSpeed);
 	}
 
@@ -1434,9 +1461,10 @@ private:
     	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 	
 		UniformBufferObject ubo = {};
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(0.0f), glm::vec3( 0.0f, 0.0f, 1.0f));
 	
-		ubo.view = glm::lookAt(glm::vec3(40.0f, 40.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.view = camera.lookAt();
+		// ubo.view = glm::lookAt(glm::vec3(40.0f, 40.0f, 20.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 400.0f);
 

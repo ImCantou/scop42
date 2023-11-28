@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:25 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/20 12:22:56 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/11/28 12:08:44 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ glm::vec3					ParserObj::ParseVertex(const std::string line) {
 	v >> x;
 	v >> y;
 	v >> z;
-	return (glm::vec3(x, z, y));
+	return (glm::vec3(x, y, z));
 }
 
 glm::vec2					ParserObj::ParseVertexText(const std::string line) {

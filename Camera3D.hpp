@@ -3,6 +3,14 @@
 
 # include "Vertex.hpp"
 
+enum	CameraCommands {
+	CAM_TRANSLATE_FORWARDS,
+	CAM_TRANSLATE_BACKWARDS,
+	CAM_TRANSLATE_LEFT,
+	CAM_TRANSLATE_RIGHT
+
+};
+
 class Camera3D
 {
 private:
@@ -11,10 +19,10 @@ private:
 	glm::vec3	up;
 public:
 	Camera3D();
-	void	rotate(glm::radians angle);
-	void	move(glm::vec3 direction);
+	void	rotate(double xoffset, double yoffset);
+	void	move(CameraCommands command , float speed);
 
-	detail::tmat4x4<T>	lookAt();
+	struct glm::mat<4, 4, glm::f32, glm::packed_highp>	lookAt();
 };
 
 

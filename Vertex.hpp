@@ -9,6 +9,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "external/glm/glm/glm.hpp"
+#include "external/glm/glm/gtc/matrix_transform.hpp"
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_X11
@@ -21,6 +24,7 @@ class Vertex {
     	glm::vec3	color;
 		glm::vec3	normal;
 		glm::vec2	texCoord;
+
 
 	public:
 		Vertex(void);
