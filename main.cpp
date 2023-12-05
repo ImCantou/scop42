@@ -178,7 +178,14 @@ private:
 		glfwSetKeyCallback(window, key_callback);
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPosCallback(window, mouse_callback);
+		glfwSetScrollCallback(window, scroll_callback);
+
     }
+
+	static void	scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+		auto app = reinterpret_cast<VulkanEngine*>(glfwGetWindowUserPointer(window));
+		app->camera.zoom(yoffset);
+	}
 
 	static void	mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 		auto app = reinterpret_cast<VulkanEngine*>(glfwGetWindowUserPointer(window));
@@ -189,8 +196,8 @@ private:
 			first = false;
 		}
 
-		float xoffset = (xpos - app->mousePos.x) * 0.04;
-		float yoffset = (app->mousePos.y - ypos) * 0.04;
+		float xoffset = (xpos - app->mousePos.x) * 0.1;
+		float yoffset = (app->mousePos.y - ypos) * 0.1;
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
 
@@ -1466,7 +1473,7 @@ private:
 		ubo.view = camera.lookAt();
 		// ubo.view = glm::lookAt(glm::vec3(40.0f, 40.0f, 20.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 400.0f);
+		ubo.proj = glm::perspective(glm::radians(camera.getFov()), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 400.0f);
 
 		ubo.proj[1][1] *= -1;
 
