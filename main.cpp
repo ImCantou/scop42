@@ -160,9 +160,12 @@ private:
 	uint32_t	currentFrame = 0;
 	bool		isInitialized = false;
 	bool		wireframeMode = false;
+	bool		rotationMode  = false;
 	bool		framebufferResized = false;
 	Camera3D	camera;
 	glm::vec2	mousePos;
+	glm::mat4	modelRotation = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::vec2	rotationOffset;
 
 
 
@@ -199,10 +202,15 @@ private:
 		float xoffset = (xpos - app->mousePos.x) * 0.1;
 		float yoffset = (app->mousePos.y - ypos) * 0.1;
 
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-
+		// if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
+		if (app->rotationMode) {
+			app->rotationOffset.x += xoffset;
+			app->rotationOffset.y += yoffset;
+			app->modelRotation = app->modelRotation + glm::rotate(glm::mat4(1.0f), yoffset * glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f))
+				 + glm::rotate(glm::mat4(1.0f), xoffset * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		}
 		else {
+			
 			app->camera.rotate(xoffset, yoffset);
 		}
 		app->mousePos.x = xpos;
@@ -216,18 +224,12 @@ private:
 	    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
 			app->wireframeMode = !app->wireframeMode;
 		}
+		if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+			app->rotationMode = !app->rotationMode;
+		}
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 			glfwSetWindowShouldClose(window, 1);
 		}
-		float cameraSpeed = 1.0f;
-    	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    	    app->camera.move(CAM_TRANSLATE_FORWARDS, cameraSpeed);
-    	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    	    app->camera.move(CAM_TRANSLATE_BACKWARDS, cameraSpeed);
-    	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    	    app->camera.move(CAM_TRANSLATE_LEFT, cameraSpeed);
-    	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    	    app->camera.move(CAM_TRANSLATE_RIGHT, cameraSpeed);
 	}
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
@@ -1462,16 +1464,25 @@ private:
 	}
 
 	void updateUniformBuffer(uint32_t currentImage) {
+		float cameraSpeed = 0.006f;
+    	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    	    camera.move(CAM_TRANSLATE_FORWARDS, cameraSpeed);
+    	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    	    camera.move(CAM_TRANSLATE_BACKWARDS, cameraSpeed);
+    	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    	    camera.move(CAM_TRANSLATE_LEFT, cameraSpeed);
+    	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    	    camera.move(CAM_TRANSLATE_RIGHT, cameraSpeed);
+
     	static auto startTime = std::chrono::high_resolution_clock::now();
 
     	auto currentTime = std::chrono::high_resolution_clock::now();
     	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 	
 		UniformBufferObject ubo = {};
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(0.0f), glm::vec3( 0.0f, 0.0f, 1.0f));
-	
+		ubo.model = glm::rotate(glm::mat4(1.0f), rotationOffset.x * glm::radians(10.0f), glm::vec3( 0.0f, 0.0f, 1.0f)) * glm::rotate(glm::mat4(1.0f), rotationOffset.y * glm::radians(10.0f), glm::vec3( 1.0f, 0.0f, 0.0f)) ;
+
 		ubo.view = camera.lookAt();
-		// ubo.view = glm::lookAt(glm::vec3(40.0f, 40.0f, 20.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		ubo.proj = glm::perspective(glm::radians(camera.getFov()), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 400.0f);
 

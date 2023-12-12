@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:00:19 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/17 13:53:41 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/12/08 08:59:09 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,9 @@ class Model3D {
 		const   std::vector<glm::vec2>&	getVerticesText() const;
 		const   std::vector<glm::vec3>&	getVerticesNorm() const;
 		const	std::vector<uint32_t>&	getIndices() const;
+
+		//Rotate Model
+		// void	rotate(glm::vec3 axis, float angle);
 };
 
 #endif

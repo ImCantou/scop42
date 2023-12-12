@@ -1,6 +1,6 @@
 #include "Camera3D.hpp"
 
-Camera3D::Camera3D(): pos(glm::vec3(0.0f, 3.0f, 0.0f)), front(glm::vec3(0.0f, -1.0f, 0.0f)), up(glm::vec3(0.0f, 0.0f, 1.0f)), fov(45.0f) {
+Camera3D::Camera3D(): pos(glm::vec3(0.0f, 3.0f, 0.0f)), front(glm::vec3(0.0f, -1.0f, 0.0f)), up(glm::vec3(0.0f, 0.0f, 1.0f)), right(glm::vec3(0.0f, 0.0f, 1.0f)), fov(45.0f), rotations(0.0f, 0.0f, 0.0f) {
 
 }
 
@@ -75,21 +75,62 @@ void	Camera3D::rotate(double xoffset, double yoffset) {
 	// 	this->front = glm::normalize(this->front);
 	// }
 
-	glm::vec3 right = glm::normalize(glm::cross(front, up));
-	xoffset *= 0.25;
-	yoffset *= 0.25;
 
 
-	front = glm::rotate(glm::mat4(1.0f), static_cast<float>(yoffset), right) * glm::vec4(front, 0.0f);
-	front = glm::rotate(glm::mat4(1.0f), static_cast<float>(xoffset), -up) * glm::vec4(front, 0.0f);
+
+	// glm::vec3 right = glm::normalize(glm::cross(front, up));
+	// xoffset *= 0.25;
+	// yoffset *= 0.25;
+
+
+	// front = glm::rotate(glm::mat4(1.0f), static_cast<float>(yoffset), right) * glm::vec4(front, 0.0f);
+	// front = glm::rotate(glm::mat4(1.0f), static_cast<float>(xoffset), -up) * glm::vec4(front, 0.0f);
 	
-	up = glm::rotate(glm::mat4(1.0f), static_cast<float>(yoffset), right) * glm::vec4(up, 0.0f);
-	up = glm::rotate(glm::mat4(1.0f), static_cast<float>(xoffset), -up) * glm::vec4(up, 0.0f);
+	// // up = glm::rotate(glm::mat4(1.0f), static_cast<float>(xoffset), -up) * glm::vec4(up, 0.0f);
+	// up = glm::rotate(glm::mat4(1.0f), static_cast<float>(yoffset), right) * glm::vec4(up, 0.0f);
 
 
+	// up = glm::normalize(up);
+	// front = glm::normalize(front);
 
-	up = glm::normalize(up);
-	front = glm::normalize(front);
+	rotations.x += -xoffset ;
+	rotations.y += yoffset ;
+	// if (rotations.z > 180.0f)
+	// 	rotations.z -= 360.0f;
+	// else if (rotations.z < -180.0f)
+	// 	rotations.z += 360.0f;
+	// if (rotations.x > 89.0f)
+	// 	rotations.x = 89.0f;
+	// if (rotations.x < -89.0f)
+	// 	rotations.x = -89.0f;
+
+	// glm::quat	qPitch	= glm::angleAxis(glm::radians(rotations.x), glm::vec3(1, 0, 0));
+	// glm::quat	qYaw	= glm::angleAxis(glm::radians(rotations.z), glm::vec3(0, 0, 1));
+	// glm::quat	qRoll	= glm::angleAxis(glm::radians(rotations.y), glm::vec3(0, 1, 0));
+
+	// glm::quat	orientation = qPitch * qYaw;
+	// orientation = glm::normalize(orientation);
+
+	// glm::mat4 rotate = glm::mat4_cast(orientation);
+	// glm::mat4 translate = glm::mat4(1.0f);
+	// translate = glm::translate(translate, - this->pos);
+
+	// glm::mat4 viewMatrix = rotate * translate;
+
+	// this->front = glm::normalize(glm::vec3(viewMatrix * glm::vec4(this->front, 0.0f)));
+	// this->right = glm::normalize(glm::vec3(viewMatrix * glm::vec4(this->right, 0.0f)));
+
+	// this->up = glm::cross(front, right);	
+
+	this->front = glm::vec3(cos(glm::radians(rotations.y)) * sin(glm::radians(rotations.x)),
+    						sin(glm::radians(rotations.y)),
+    						cos(glm::radians(rotations.y)) * cos(glm::radians(rotations.x)));
+	
+	this->right = glm::vec3(sin(glm::radians(rotations.x) - glm::radians(90.0f)),
+							0,
+    						cos(glm::radians(rotations.x) - glm::radians(90.0f)));
+
+	this->up = glm::cross(right, front);
 }
 
 

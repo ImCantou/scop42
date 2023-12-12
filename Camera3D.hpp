@@ -17,7 +17,11 @@ private:
 	glm::vec3	pos;
 	glm::vec3	front;
 	glm::vec3	up;
+	glm::vec3	right;
 	float		fov;
+
+	glm::vec3	rotations;
+
 public:
 	Camera3D();
 	void	rotate(double xoffset, double yoffset);
