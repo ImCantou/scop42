@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:25 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/28 12:08:44 by qcherel          ###   ########.fr       */
+/*   Updated: 2024/01/18 12:12:49 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ Model3D						ParserObj::parseFile(const std::string filename) {
 	
 	Model3D					object;			
 	std::ifstream			in(filename, std::ios::in);
-	Model3D					*currentModel = nullptr;
 	std::string				line;
 	 
 	if (!in)

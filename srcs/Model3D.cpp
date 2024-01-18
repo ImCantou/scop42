@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:01:54 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/17 14:24:53 by qcherel          ###   ########.fr       */
+/*   Updated: 2024/01/08 15:21:26 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,11 @@ const std::vector<glm::vec2>&	Model3D::getVerticesText() const {
 const std::vector<glm::vec3>&	Model3D::getVerticesNorm() const {
 	return (this->verticesNorm);
 }
+
+const	std::string				Model3D::getTextureFile() const {
+	return (this->textureFile);
+}
+
 
 void	Model3D::setMtllib(const std::string mtlLib) {
 	this->mtllib = mtlLib;

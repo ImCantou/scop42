@@ -161,3 +161,119 @@ VkPipelineDepthStencilStateCreateInfo VulkanInitializer::depth_stencil_create_in
 	return info;
 }
 
+VkSamplerCreateInfo VulkanInitializer::sampler_create_info(VkPhysicalDeviceProperties properties){
+	VkSamplerCreateInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	info.magFilter = VK_FILTER_LINEAR;
+	info.minFilter = VK_FILTER_LINEAR;
+
+	info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+	info.anisotropyEnable = VK_TRUE;
+
+	info.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+	info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	info.unnormalizedCoordinates = VK_FALSE;
+	info.compareEnable = VK_FALSE;
+	info.compareOp = VK_COMPARE_OP_ALWAYS;
+
+	info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	info.mipLodBias = 0.0f;
+	info.minLod = 0.0f;
+	info.maxLod = 0.0f;
+
+	return info;
+}
+
+VkDescriptorPoolCreateInfo VulkanInitializer::descriptor_pool_create_info(uint32_t poolSize, const VkDescriptorPoolSize *pPoolSizes) {
+	VkDescriptorPoolCreateInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	info.poolSizeCount = static_cast<uint32_t>(poolSize);
+	info.pPoolSizes = pPoolSizes;
+	info.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	info.flags = 0;
+
+	return info;
+}
+
+VkDeviceQueueCreateInfo	VulkanInitializer::device_queue_create_info(uint32_t family, float *pPriority) {
+	VkDeviceQueueCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    info.queueFamilyIndex = family;
+    info.queueCount = 1;
+    info.pQueuePriorities = pPriority;
+
+	return info;
+}
+
+VkDeviceCreateInfo	VulkanInitializer::device_create_info(std::vector<VkDeviceQueueCreateInfo>& queues, VkPhysicalDeviceFeatures *features, const std::vector<const char *>& extensions) {
+	VkDeviceCreateInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	info.queueCreateInfoCount = static_cast<uint32_t>(queues.size());
+	info.pQueueCreateInfos = queues.data();
+	info.pEnabledFeatures = features;
+	info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+	info.ppEnabledExtensionNames = extensions.data();
+	info.enabledLayerCount = 0;
+
+	return info;
+}
+
+VkApplicationInfo	VulkanInitializer::application_info(const char *appName, const char *engineName) {
+	VkApplicationInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	info.pApplicationName = appName;
+	info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+	info.pEngineName = engineName;
+	info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+	info.apiVersion = VK_API_VERSION_1_0;
+
+	return info;
+}
+
+VkDescriptorSetLayoutBinding VulkanInitializer::descriptor_set_layout_binding(VkDescriptorType type, VkShaderStageFlagBits stageFlag) {
+	VkDescriptorSetLayoutBinding binding = {};
+	binding.descriptorType = type;
+	binding.descriptorCount = 1;
+	binding.stageFlags = stageFlag;
+	binding.pImmutableSamplers = nullptr;
+
+	return binding;
+}
+
+VkViewport VulkanInitializer::viewport_create(VkExtent2D extent) {
+	VkViewport viewport = {};
+	viewport.x = 0.0f;
+	viewport.y = 0.0f;
+	viewport.width = static_cast<float>(extent.width);
+	viewport.height = static_cast<float>(extent.height);
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+
+	return viewport;
+}
+
+VkRect2D VulkanInitializer::scissor_create(VkExtent2D extent) {
+	VkRect2D scissor = {};
+	scissor.offset = {0,0};
+	scissor.extent = extent;
+
+	return scissor;
+}
+
+VkAttachmentDescription VulkanInitializer::base_attachment_setup(VkFormat format) {
+	VkAttachmentDescription attachment = {};
+	attachment.format = format;
+	attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	attachment.finalLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+	return attachment;
+}
+

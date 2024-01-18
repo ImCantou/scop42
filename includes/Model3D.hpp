@@ -6,18 +6,15 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:00:19 by qcherel           #+#    #+#             */
-/*   Updated: 2023/12/08 08:59:09 by qcherel          ###   ########.fr       */
+/*   Updated: 2024/01/18 12:32:23 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef __MODEL3D_CLASS__
-#define __MODEL3D_CLASS__
+#pragma once
 
 # include <iostream>
 # include <vector>
 # include "Vertex.hpp"
-
-
 
 class Model3D {
 
@@ -30,6 +27,8 @@ class Model3D {
 		std::vector<uint32_t>	indices;
 		std::vector<uint32_t>	indicesText;
 		std::vector<uint32_t>	indicesNorm;
+		
+		std::string				textureFile;
 
 	public:
 		Model3D(void);
@@ -55,8 +54,9 @@ class Model3D {
 		const   std::vector<glm::vec3>&	getVerticesNorm() const;
 		const	std::vector<uint32_t>&	getIndices() const;
 
+		const	std::string				getTextureFile() const;
+
 		//Rotate Model
 		// void	rotate(glm::vec3 axis, float angle);
 };
 
-#endif

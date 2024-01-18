@@ -1,5 +1,4 @@
-#ifndef __DELETIONQUEUE_CLASS__
-#define __DELETIONQUEUE_CLASS__
+#pragma once 
 
 #include <functional>
 #include <deque>
@@ -13,6 +12,3 @@ class	DeletionQueue
 		void	add(std::function<void()>&& function);
 		void	execute();
 };
-
-
-#endif

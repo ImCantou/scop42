@@ -1,5 +1,5 @@
-#ifndef __VERTEX_CLASS__
-#define __VERTEX_CLASS__
+#pragma once 
+
 
 # include <iostream>
 # include <array>
@@ -9,10 +9,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
-
-
-#include "external/glm/glm/glm.hpp"
-#include "external/glm/glm/gtc/matrix_transform.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -24,7 +20,7 @@ class Vertex {
 	private:
 		glm::vec3	pos;
     	glm::vec3	color;
-		glm::vec3	normal;
+		// glm::vec3	normal;
 		glm::vec2	texCoord;
 
 
@@ -39,5 +35,3 @@ class Vertex {
     	static VkVertexInputBindingDescription getBindingDescription();
     	static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
 };
-
-#endif

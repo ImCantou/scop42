@@ -5,9 +5,6 @@ Camera3D::Camera3D(): pos(glm::vec3(0.0f, 3.0f, 0.0f)), front(glm::vec3(0.0f, -1
 }
 
 void	Camera3D::move(CameraCommands command, float speed) {
-	std::cout << "pos: (" << pos.x << " , " << pos.y << " , " << pos.z << ")" << std::endl;
-	std::cout << "front: (" << front.x << " , " << front.y << " , " << front.z << ")" << std::endl;
-	std::cout << "up: (" << up.x << " , " << up.y << " , " << up.z << ")" << std::endl;
 	switch (command)
 	{
 	case CAM_TRANSLATE_FORWARDS:

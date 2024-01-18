@@ -1,5 +1,4 @@
-#ifndef __PIPELINECREATOR_CLASS__
-# define __PIPELINECREATOR_CLASS__
+#pragma once 
 
 # include "VulkanInitializer.hpp"
 # include <vector>
@@ -32,5 +31,3 @@ public:
 	void		setPipelineLayout(VkPipelineLayout);
 };
 
-
-#endif

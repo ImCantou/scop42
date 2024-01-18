@@ -6,12 +6,11 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:20 by qcherel           #+#    #+#             */
-/*   Updated: 2023/11/20 12:13:06 by qcherel          ###   ########.fr       */
+/*   Updated: 2024/01/18 12:32:38 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef __PARSEROBJ_CLASS__
-#define __PARSEROBJ_CLASS__
+#pragma once 
 
 #include <optional>
 #include <iostream>
@@ -66,5 +65,3 @@ class	ParserObj {
 		static Model3D					parseFile(const std::string filename);
 
 };
-
-#endif

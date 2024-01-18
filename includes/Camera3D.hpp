@@ -1,5 +1,4 @@
-#ifndef	__CAMERA3D_CLASS__
-# define __CAMERA3D_CLASS__
+#pragma once
 
 # include "Vertex.hpp"
 
@@ -32,5 +31,3 @@ public:
 	float	getFov();
 };
 
-
-#endif

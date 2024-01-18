@@ -1,45 +1,55 @@
+NAME        =   Scop42
 
-SRCS= main.cpp str_utils.cpp Model3D.cpp DeletionQueue.cpp VulkanInitializer.cpp PipelineCreator.cpp ParserObj.cpp Vertex.cpp Camera3D.cpp
+SRCS		= 	srcs/main.cpp \
+				srcs/str_utils.cpp \
+				srcs/Model3D.cpp \
+				srcs/DeletionQueue.cpp \
+				srcs/VulkanInitializer.cpp \
+				srcs/PipelineCreator.cpp \
+				srcs/ParserObj.cpp \
+				srcs/Vertex.cpp \
+				srcs/Camera3D.cpp \
+				srcs/EngineUtils.cpp \
+				srcs/VulkanEngine.cpp
 
-CXX= g++
+INC_DIR		=	includes
 
-NAME        =   VulkanTest
+CXX			= 	c++
 
-MLXDIR		=	minilibx
+RM			=	rm -f
 
 GLM_PATH	=	external/glm
 
 STB_PATH	=	external/stb
 
-all: ${NAME}
+OBJS		=	$(SRCS:.cpp=.o)
 
-
-CXXFLAGS = -std=c++20 -O3 -I$(GLM_PATH) -I$(STB_PATH)
+CXXFLAGS = -Wall -Werror -Wextra -std=c++20 -O3
 
 LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 
+all: ${NAME}
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp 
-			@$(CC) -c $(CFLAGS) $< -o $@
-			@printf "`tput bold`\033[92m[SUCCESS]\033[0;37m: `tput bold`Compilating \033[1;94m${SRCDIR}\033[0;37m/$(notdir $<)\033[1;37m to object done.\n`tput sgr0`"
+%.o: %.cpp 
+			$(CXX) $(CXXFLAGS) -I $(INC_DIR) -I $(GLM_PATH) -I $(STB_PATH) -o $@ -c $< 
 
-
-
-${NAME}: $(SRCS)
-	$(CXX) $(CXXFLAGS) -o $(NAME) ${SRCS} $(LDFLAGS)
+${NAME}: $(OBJS)
+#	~/glslc shaders/shader.vert -o compiled_shaders/vert.spv
+#	~/glslc shaders/shader.frag -o compiled_shaders/frag.spv
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) -o $(NAME) 
 
 shaders:
-	
 
-debug: $(SRCS)
-	$(CXX) $(CXXFLAGS) -DNDEBUG -o $(NAME) main.cpp $(LDFLAGS)
 
 test: ${NAME}
-	./VulkanTest
+	./${NAME}
 
 clean:
-	rm -f $(NAME)
+	${RM} $(OBJS)
 
-re: clean all
+fclean:	clean
+	$(RM) $(NAME)
 
-.PHONY: test clean
+re: fclean all
+
+.PHONY: test clean fclean re all
