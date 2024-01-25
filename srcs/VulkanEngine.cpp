@@ -7,11 +7,14 @@ VulkanEngine::VulkanEngine(std::string path) {
 	this->physicalDevice = VK_NULL_HANDLE;
 	this->pathToFile = path;
 	this->currentFrame = 0;
+	this->wireframeMode = false;
 	this->isInitialized = false;
 	this->framebufferResized = false;
 	this->camera = Camera3D();
 	this->mousePos = glm::vec2(0,0);
 	this->rotationOffset = glm::vec2(0,0);
+	this->graphicsPipeline = VK_NULL_HANDLE;
+	this->graphicsPipelineWireframe = VK_NULL_HANDLE;
 }
 
 void	VulkanEngine::run() {
@@ -38,23 +41,26 @@ void	VulkanEngine::initWindow() {
 void VulkanEngine::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 	(void) xoffset;
 	auto app = reinterpret_cast<VulkanEngine*>(glfwGetWindowUserPointer(window));
-	app->camera.zoom(yoffset);
+	app->setCameraZoom(yoffset);
+}
+
+void	VulkanEngine::setCameraZoom(double offset) {
+	this->camera.zoom(offset);
 }
 
 void VulkanEngine::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	auto app = reinterpret_cast<VulkanEngine*>(glfwGetWindowUserPointer(window));
 	static bool first = true;
 	if (first) {
-		app->mousePos.x = xpos;
-		app->mousePos.y = ypos;
+		app->setMousePos(xpos, ypos);
 		first = false;
 	}
-	
-	// float xoffset = (xpos - app->mousePos.x) * 0.1;
-	// float yoffset = (app->mousePos.y - ypos) * 0.1;
-//		app->camera.rotate(xoffset, yoffset);
-	app->mousePos.x = xpos;
-	app->mousePos.y = ypos;
+	app->setMousePos(xpos, ypos);
+}
+
+void	VulkanEngine::setMousePos(double x, double y) {
+	this->mousePos.x = x;
+	this->mousePos.y = y;
 }
 
 void VulkanEngine::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -64,18 +70,26 @@ void VulkanEngine::key_callback(GLFWwindow* window, int key, int scancode, int a
 	auto app = reinterpret_cast<VulkanEngine*>(glfwGetWindowUserPointer(window));
 	std::cout << key << std::endl;
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-		app->wireframeMode = !app->wireframeMode;
+		app->changeWireframeMode();
 	}
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, 1);
 	}
 }
 
+void	VulkanEngine::changeWireframeMode() {
+	this->wireframeMode = !this->wireframeMode;
+}
+
 void VulkanEngine::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
 	auto app = reinterpret_cast<VulkanEngine*>(glfwGetWindowUserPointer(window));
-    app->framebufferResized = true;
+	app->resize();
 	(void) width;
 	(void) height;
+}
+
+void	VulkanEngine::resize() {
+	this->framebufferResized = true;
 }
 
 void VulkanEngine::initVulkan() {
@@ -92,10 +106,10 @@ void VulkanEngine::initVulkan() {
 	createCommandPool();
 	createDepthResources();
 	createFramebuffers();
+	loadModel();
 	createTextureImage();
 	createTextureImageView();
 	createTextureSampler();
-	loadModel();
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -108,7 +122,14 @@ void VulkanEngine::initVulkan() {
 }
 
 void	VulkanEngine::loadModel() {
-		this->model = ParserObj::parseFile(pathToFile);
+	this->model = ParserObj::parseFile(pathToFile);
+	model.createMesh();
+	std::cout << "mesh:			" << model.getMesh().size() << std::endl;
+	std::cout << "indices:		" << model.getIndices().size() << std::endl;
+	std::cout << "indicesText:	" << model.getIndicesText().size() << std::endl;
+	std::cout << "indicesNorm:	" << model.getIndicesNorm().size() << std::endl;
+	std::cout << "verticesPos:	" << model.getVerticesPos().size() << std::endl;
+	std::cout << "verticesText:	" << model.getVerticesText().size() << std::endl;
 }
 
 void	VulkanEngine::createDepthResources() {
@@ -191,7 +212,7 @@ VkImageView		VulkanEngine::createImageView(VkImage image, VkFormat format, VkIma
 void	VulkanEngine::createTextureImage() {
 	// read Texture image to pixels using STBI library
 	int texWidth, texHeight, texChannels;
-	stbi_uc*	pixels = stbi_load(model.getTextureFile().c_str() , &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc*	pixels = stbi_load(model.getTextureFile().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize	imgSize = texWidth * texHeight * STBI_rgb_alpha;
 
 	if (!pixels) {
@@ -464,14 +485,14 @@ void	VulkanEngine::createDescriptorSetLayout() {
 }
 
 void	VulkanEngine::createIndexBuffer() {
-	VkDeviceSize bufferSize = sizeof(model.getIndices()[0]) * model.getIndices().size();
+	VkDeviceSize bufferSize = sizeof(model.getMeshIndices()[0]) * model.getMeshIndices().size();
 
 	t_AllocatedBuffer	stagingABuffer;
 	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingABuffer.buffer, stagingABuffer.memory);
 
 	void* data;
 	vkMapMemory(device, stagingABuffer.memory, 0, bufferSize, 0, &data);
-	memcpy(data, model.getIndices().data(), (size_t) bufferSize);
+	memcpy(data, model.getMeshIndices().data(), (size_t) bufferSize);
 	vkUnmapMemory(device, stagingABuffer.memory);
 
 	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexABuffer.buffer, indexABuffer.memory);
@@ -488,7 +509,7 @@ void	VulkanEngine::createIndexBuffer() {
 }
 
 void	VulkanEngine::createVertexBuffer() {
-	VkDeviceSize bufferSize = sizeof(model.getVertices()[0]) * model.getVertices().size();
+	VkDeviceSize bufferSize = sizeof(model.getMesh()[0]) * model.getMesh().size();
 		
 	t_AllocatedBuffer	stagingABuffer;
 
@@ -496,7 +517,7 @@ void	VulkanEngine::createVertexBuffer() {
 
 	void*	data;
 	vkMapMemory(device, stagingABuffer.memory, 0, bufferSize, 0, &data);
-	memcpy(data, model.getVertices().data(), (size_t) bufferSize);
+	memcpy(data, model.getMesh().data(), (size_t) bufferSize);
 	vkUnmapMemory(device, stagingABuffer.memory);
 
 	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexABuffer.buffer, vertexABuffer.memory);
@@ -615,11 +636,12 @@ void	VulkanEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 	renderPassInfo.pClearValues = clearValues.data();
 
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-	if (wireframeMode)
+ 
+	if (!wireframeMode) {
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineWireframe);
-	else
+	} else {
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+	}
 
 	VkBuffer		vertexBuffers[] = {vertexABuffer.buffer};
 	VkDeviceSize	offsets[] = {0};
@@ -636,7 +658,7 @@ void	VulkanEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 		// vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
-	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(model.getIndices().size()), 1, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(model.getMeshIndices().size()), 1, 0, 0, 0);
 
 	vkCmdEndRenderPass(commandBuffer);
 
@@ -801,14 +823,14 @@ void	VulkanEngine::createGraphicsPipeline() {
 	pipelineCreator.setDepthStencil(VulkanInitializer::depth_stencil_create_info());
     pipelineCreator.setPipelineLayout(pipelineLayout);
 	pipelineCreator.setVertexInput(vertexInputStateInfo);
+	
+	graphicsPipelineWireframe = pipelineCreator.build_pipeline(device, renderPass);
+	pipelineCreator.setRasterizer(VulkanInitializer::rasterization_state_create_info(VK_POLYGON_MODE_LINE));
 	graphicsPipeline = pipelineCreator.build_pipeline(device, renderPass);
 
 	_mainDeletionQueue.add([=, this]() {
 		vkDestroyPipeline(device, graphicsPipeline, nullptr);
 	});
-
-	pipelineCreator.setRasterizer(VulkanInitializer::rasterization_state_create_info(VK_POLYGON_MODE_LINE));
-	graphicsPipelineWireframe = pipelineCreator.build_pipeline(device, renderPass);
 
 	_mainDeletionQueue.add([=, this]() {
 		vkDestroyPipeline(device, graphicsPipelineWireframe, nullptr);

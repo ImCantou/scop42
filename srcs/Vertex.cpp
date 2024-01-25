@@ -4,11 +4,10 @@ Vertex::Vertex (void) {
 }
 
 Vertex::Vertex (glm::vec3 position): pos(position), color({0.8f, 0.8f, 0.8f}), texCoord({-1.0f, -1.0f}) {
-	static int i = 0;
-	if (i % 2 == 0)
-		texCoord = {1.0f, 1.0f};
-	
-	i = (i + 1) % 2;
+}
+
+Vertex::Vertex (glm::vec3 position, glm::vec2 texture, glm::vec3 normalPos): pos(position), color({0.8f, 0.8f, 0.8f}), texCoord(texture), normal(normalPos) {
+	texCoord.y = 1.0f - texCoord.y;  
 }
 
 Vertex::Vertex (Vertex const & src)
@@ -22,6 +21,7 @@ Vertex & Vertex::operator=(Vertex const & rhs)
 		this->color = rhs.color;
 		this->pos = rhs.pos;
 		this->texCoord = rhs.texCoord;
+		this->normal = rhs.normal;
 	}
 	return *this;
 }

@@ -19,7 +19,14 @@ class VulkanEngine {
 public:
 	VulkanEngine(std::string path);
 
-    void run();
+    void	run();
+
+
+	// Setters for callbacks
+	void	setCameraZoom(double offset);
+	void	setMousePos(double x, double y);
+	void	changeWireframeMode();
+	void	resize();
 
 private:
 	//Window basic components

@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:20 by qcherel           #+#    #+#             */
-/*   Updated: 2024/01/18 12:32:38 by qcherel          ###   ########.fr       */
+/*   Updated: 2024/01/22 12:13:21 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@
 #include <array>
 #include <chrono>
 
-#include "Model3D.hpp"
-#include "str_utils.hpp"
+# include "Model3D.hpp"
+# include "str_utils.hpp"
 
 # define	GLM_FORCE_RADIANS
 # define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -51,6 +51,7 @@ enum	e_typeParse {
 class	ParserObj {
 	private: 
 		static int						getLineType(const	std::string	line);
+		
 
 		static glm::vec3				ParseVertex(const std::string	line);
 		static glm::vec3				ParseVertexNormal(const std::string line);

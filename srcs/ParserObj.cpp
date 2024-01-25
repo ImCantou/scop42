@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/10 12:02:25 by qcherel           #+#    #+#             */
-/*   Updated: 2024/01/18 12:12:49 by qcherel          ###   ########.fr       */
+/*   Updated: 2024/01/25 14:38:16 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,10 @@ Model3D						ParserObj::parseFile(const std::string filename) {
 	if (!in)
 		throw	std::runtime_error("failed to open .obj file!");
 
-
 	while(std::getline(in, line)) {
 		switch(ParserObj::getLineType(line)) {
 			case VERTEX :
-			 	object.addVertex(Vertex(ParseVertex(line)));
+			 	object.addVertexPos(ParseVertex(line));
 			 	break;
 			case VERTEX_TEXTURE :
 				object.addVertexText(ParseVertexText(line));
@@ -107,11 +106,11 @@ void		ParserObj::ParseFace(Model3D& model, const std::string line) {
 
 	
 	model.addFace(vert, vertText, vertNorm);
-	// std::cin.getline(line);
+	// std::cout << model.getVerticesText().size() << std::endl;
 }
 
 bool						ParserObj::checkExistingVertexInFace(const Model3D& model, const std::vector<uint32_t>& vert, const std::vector<uint32_t>& vertText, const std::vector<uint32_t>& vertNorm) {
-	uint32_t size = model.getVertices().size();	
+	uint32_t size = model.getVerticesPos().size();	
 	for ( uint32_t index : vert) {
 		if (index >= size)
 			return false;

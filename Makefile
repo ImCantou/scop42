@@ -24,7 +24,7 @@ STB_PATH	=	external/stb
 
 OBJS		=	$(SRCS:.cpp=.o)
 
-CXXFLAGS = -Wall -Werror -Wextra -std=c++20 -O3
+CXXFLAGS = -Wall -Werror -Wextra -std=c++20 -O3 -g
 
 LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 

@@ -23,7 +23,7 @@ VkCommandBufferAllocateInfo VulkanInitializer::command_buffer_allocate_info(VkCo
 }
 
 VkPipelineShaderStageCreateInfo VulkanInitializer::pipeline_shader_stage_create_info(VkShaderStageFlagBits stage, VkShaderModule shaderModule) {
-	VkPipelineShaderStageCreateInfo info{};
+	VkPipelineShaderStageCreateInfo info = {};
 	info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	info.pNext = nullptr;
 

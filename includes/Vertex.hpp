@@ -20,13 +20,14 @@ class Vertex {
 	private:
 		glm::vec3	pos;
     	glm::vec3	color;
-		// glm::vec3	normal;
 		glm::vec2	texCoord;
+		glm::vec3	normal;
 
 
 	public:
 		Vertex(void);
 		Vertex(glm::vec3 position);
+		Vertex(glm::vec3 position, glm::vec2 texture, glm::vec3 normalPos);
 		Vertex(const Vertex & src);
 		~Vertex(void);
 

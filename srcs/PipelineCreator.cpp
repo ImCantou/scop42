@@ -29,7 +29,7 @@ VkPipeline	PipelineCreator::build_pipeline(VkDevice device, VkRenderPass pass){
 
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	pipelineInfo.stageCount = 2;
+	pipelineInfo.stageCount = _shaderStages.size();
 	pipelineInfo.pStages = _shaderStages.data();
 	pipelineInfo.pVertexInputState = &_vertexInputInfo;
 	pipelineInfo.pInputAssemblyState = &_inputAssembly;
